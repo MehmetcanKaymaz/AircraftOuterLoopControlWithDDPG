@@ -6,16 +6,17 @@ import matplotlib.pyplot as plt
 from ddpg import DDPGagent
 from utils import *
 from Environment import Env
+import datetime
 
 env = Env()
 
 agent = DDPGagent(env)
 noise = OUNoise(env.action_space,env.action_space_min,env.action_space_max)
-batch_size = 128
+batch_size = 1000
 rewards = []
 avg_rewards = []
 
-for episode in range(10):
+for episode in range(100000):
     state = env.reset()
     state=np.array(state)
     noise.reset()
@@ -24,13 +25,11 @@ for episode in range(10):
     for step in range(1000):
         action = agent.get_action(state)
         action = noise.get_action(action, step)
-        #print(action)
         new_state, reward, done = env.step(action)
         new_state=np.array(new_state)
         agent.memory.push(state, action, reward, new_state, done)
 
         if len(agent.memory) > batch_size:
-            #print("Learning Started")
             agent.update(batch_size)
 
         state = new_state
@@ -43,10 +42,15 @@ for episode in range(10):
             break
 
     rewards.append(episode_reward)
-    avg_rewards.append(np.mean(rewards[-10:]))
+    avg_rewards.append(np.mean(rewards[-100:]))
+    if episode%1000==0:
+        agent.save_models()
 
 
 agent.save_models()
+np.savetxt("Outputs/reward"+str(datetime.datetime.now())+".txt",rewards)
+np.savetxt("Outputs/avg_reward"+str(datetime.datetime.now())+".txt",avg_rewards)
+
 """
 plt.plot(rewards)
 plt.plot(avg_rewards)

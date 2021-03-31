@@ -9,7 +9,7 @@ import datetime
 
 
 class DDPGagent:
-    def __init__(self, env, hidden_size=256, actor_learning_rate=1e-4, critic_learning_rate=1e-3, gamma=0.99, tau=1e-2,
+    def __init__(self, env, hidden_size=256, actor_learning_rate=1e-5, critic_learning_rate=1e-4, gamma=0.995, tau=1e-2,
                  max_memory_size=50000):
         # Params
         self.num_states = env.obs_space
